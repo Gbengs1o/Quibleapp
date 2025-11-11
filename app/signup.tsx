@@ -10,14 +10,16 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 const SignupScreen = () => {
+    const router = useRouter();
     const theme = useColorScheme() ?? 'light';
     const inputColor = useThemeColor({ light: '#1F2050', dark: '#FFFFFF' }, 'text');
     const backgroundColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A2E' }, 'background');
@@ -38,6 +40,7 @@ const SignupScreen = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Validation functions
     const validateEmail = (email: string) => {
@@ -80,12 +83,36 @@ const SignupScreen = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (validateForm()) {
-            Alert.alert('Success', 'Account created successfully!');
-            // Handle signup logic here
-        } else {
-            Alert.alert('Error', 'Please fix the errors in the form');
+            setIsLoading(true);
+            try {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/auth/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: `${formData.firstName} ${formData.lastName}`,
+                        email: formData.email,
+                        phone: `+234${formData.phoneNumber}`,
+                        password: formData.password,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    Alert.alert('Success', 'Account created successfully!');
+                    router.push('/edit-profile');
+                } else {
+                    Alert.alert('Error', data.message || 'Something went wrong');
+                }
+            } catch (error) {
+                Alert.alert('Error', 'An unexpected error occurred');
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -310,8 +337,13 @@ const SignupScreen = () => {
                         style={styles.continueButton}
                         onPress={handleContinue}
                         activeOpacity={0.8}
+                        disabled={isLoading}
                     >
-                        <Text style={styles.continueButtonText}>Continue</Text>
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.continueButtonText}>Continue</Text>
+                        )}
                     </TouchableOpacity>
 
                     <View style={styles.orContainer}>
