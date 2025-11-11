@@ -64,6 +64,10 @@ const VerifyEmailScreen = () => {
         }
     };
 
+    const handleResend = () => {
+        Alert.alert('Info', 'This feature is not yet implemented. Please check with the backend team to ensure the email service is running.');
+    };
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -98,6 +102,10 @@ const VerifyEmailScreen = () => {
                         ) : (
                             <Text style={styles.verifyButtonText}>Verify Email</Text>
                         )}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.resendButton} onPress={handleResend}>
+                        <ThemedText style={styles.resendButtonText}>Resend Code</ThemedText>
                     </TouchableOpacity>
                 </View>
             </ThemedView>
@@ -153,6 +161,16 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'OpenSans_700Bold',
         letterSpacing: 0.5,
+    },
+    resendButton: {
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    resendButtonText: {
+        color: '#F58220',
+        fontSize: 16,
+        fontFamily: 'OpenSans_600SemiBold',
+        textDecorationLine: 'underline',
     },
 });
 

@@ -35,15 +35,6 @@ const EditProfileScreen = () => {
         fetchUserData();
     }, []);
 
-    const handleLogout = async () => {
-        try {
-            await AsyncStorage.removeItem('userData');
-            router.replace('/login');
-        } catch (error) {
-            Alert.alert('Error', 'Failed to log out.');
-        }
-    };
-
     return (
         <ThemedView style={[styles.container, { backgroundColor }]}>
             <ThemedText type="title" style={{ color: labelColor }}>Edit Profile</ThemedText>
@@ -57,9 +48,6 @@ const EditProfileScreen = () => {
                     <ThemedText style={[styles.value, { color: labelColor }]}>{userData.phone}</ThemedText>
                 </View>
             )}
-            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Text style={styles.logoutButtonText}>Logout</Text>
-            </TouchableOpacity>
         </ThemedView>
     );
 };
@@ -85,25 +73,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'OpenSans_400Regular',
         marginBottom: 20,
-    },
-    logoutButton: {
-        backgroundColor: '#FF3B30',
-        borderRadius: 28,
-        paddingVertical: 16,
-        paddingHorizontal: 30,
-        alignItems: 'center',
-        marginTop: 40,
-        shadowColor: '#FF3B30',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    logoutButtonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontFamily: 'OpenSans_700Bold',
-        letterSpacing: 0.5,
     },
 });
 

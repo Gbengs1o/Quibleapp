@@ -4,7 +4,11 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Svg, { Path } from 'react-native-svg';
 
-const ProfileHeader = () => {
+interface UserData {
+    name: string;
+}
+
+const ProfileHeader = ({ userData }: { userData: UserData | null }) => {
   return (
     <View style={styles.wrapper}>
       {/* Curved Background */}
@@ -35,7 +39,7 @@ const ProfileHeader = () => {
             <ThemedText style={styles.badgeText}>✓</ThemedText>
           </View>
         </View>
-        <ThemedText type="title" style={styles.name}>John Doe</ThemedText>
+        <ThemedText type="title" style={styles.name}>{userData ? userData.name : 'Guest'}</ThemedText>
         <ThemedText style={styles.memberSince}>Member since 2024</ThemedText>
       </ThemedView>
     </View>

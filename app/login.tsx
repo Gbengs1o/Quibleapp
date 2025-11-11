@@ -17,10 +17,11 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link, useRouter } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/hooks/use-auth';
 
 const LoginScreen = () => {
     const router = useRouter();
+    const { login } = useAuth();
     const theme = useColorScheme() ?? 'light';
     const inputColor = useThemeColor({ light: '#1F2050', dark: '#FFFFFF' }, 'text');
     const backgroundColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A2E' }, 'background');
@@ -78,9 +79,8 @@ const LoginScreen = () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    await AsyncStorage.setItem('userData', JSON.stringify(data.user));
-                    await AsyncStorage.setItem('accessToken', data.access_token);
-                    router.push('/edit-profile');
+                    await login(data.access_token);
+                    router.push('/(tabs)/Profile');
                 } else {
                     Alert.alert('Error', data.message || 'Something went wrong');
                 }
