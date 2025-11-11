@@ -17,6 +17,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link, useRouter } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = () => {
     const router = useRouter();
@@ -53,8 +54,6 @@ const LoginScreen = () => {
         }
         if (!formData.password) {
             newErrors.password = 'Password is required';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'Password must be at least 8 characters';
         }
 
         setErrors(newErrors);
@@ -79,8 +78,22 @@ const LoginScreen = () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    Alert.alert('Success', 'Logged in successfully!');
-                    router.push('/edit-profile');
+                    await AsyncStorage.setItem('accessToken', data.access_token);
+
+                    // Fetch user data
+                    const userResponse = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/auth/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${data.access_token}`
+                        }
+                    });
+
+                    if(userResponse.ok) {
+                        const userData = await userResponse.json();
+                        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+                        router.push('/edit-profile');
+                    } else {
+                        Alert.alert('Error', 'Failed to fetch user data.');
+                    }
                 } else {
                     Alert.alert('Error', data.message || 'Something went wrong');
                 }

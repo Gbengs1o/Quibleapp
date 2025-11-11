@@ -17,6 +17,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link, useRouter } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignupScreen = () => {
     const router = useRouter();
@@ -103,8 +104,11 @@ const SignupScreen = () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    Alert.alert('Success', 'Account created successfully!');
-                    router.push('/edit-profile');
+                    await AsyncStorage.setItem('userData', JSON.stringify(data));
+                    router.push({
+                        pathname: '/verify-email',
+                        params: { userId: data.id },
+                    });
                 } else {
                     Alert.alert('Error', data.message || 'Something went wrong');
                 }
