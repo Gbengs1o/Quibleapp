@@ -6,28 +6,39 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 
-const ProfileMenuList = () => {
+const ProfileMenuList = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const iconColor = useThemeColor({ light: '#000', dark: '#fff' }, 'text');
   const containerBgColor = useThemeColor({ light: 'rgba(31, 32, 80, 0.08)', dark: 'rgba(31, 32, 80, 0.4)' });
   const separatorColor = useThemeColor({ light: 'rgba(0,0,0,0.1)', dark: 'rgba(255,255,255,0.1)' });
 
-  const menuItems = [
+  const allMenuItems = [
     {
       title: 'Edit Profile',
       icon: <Feather name="edit" size={24} color={iconColor} />,
       href: '/edit-profile' as const,
+      requiresAuth: true,
+    },
+    {
+        title: 'Change Password',
+        icon: <Ionicons name="lock-closed-outline" size={24} color={iconColor} />,
+        href: '/change-password' as const,
+        requiresAuth: true,
     },
     {
       title: 'Wallet',
       icon: <Ionicons name="wallet-outline" size={24} color={iconColor} />,
       href: '/wallet' as const,
+      requiresAuth: false,
     },
     {
       title: 'History',
       icon: <MaterialIcons name="history" size={24} color={iconColor} />,
       href: '/history' as const,
+      requiresAuth: false,
     },
   ];
+
+  const menuItems = allMenuItems.filter(item => !item.requiresAuth || isLoggedIn);
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: containerBgColor }]}>
