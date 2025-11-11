@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { ThemedView } from './themed-view';
-import { ThemedText } from './themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ThemedText } from './themed-text';
+import { ThemedView } from './themed-view';
 
 const ProfileActionsList = ({ isLoggedIn, onLogout }: { isLoggedIn: boolean, onLogout: () => void }) => {
   const iconColor = useThemeColor({ light: '#000', dark: '#fff' }, 'text');
@@ -34,15 +34,25 @@ const ProfileActionsList = ({ isLoggedIn, onLogout }: { isLoggedIn: boolean, onL
     <ThemedView style={[styles.container, { backgroundColor: containerBgColor }]}>
       {menuItems.map((item, index) => (
         <React.Fragment key={item.title}>
+          {item.href ? (
+            <Link href={item.href} asChild>
+              <TouchableOpacity style={styles.menuItem}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <View style={styles.iconContainer}>{item.icon}</View>
+                  <ThemedText style={styles.menuText}>{item.title}</ThemedText>
+                  <Feather name="chevron-right" size={24} color={iconColor} />
+                </View>
+              </TouchableOpacity>
+            </Link>
+          ) : (
             <TouchableOpacity style={styles.menuItem} onPress={item.onPress}>
-                <Link href={item.href || ''} asChild>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                        <View style={styles.iconContainer}>{item.icon}</View>
-                        <ThemedText style={styles.menuText}>{item.title}</ThemedText>
-                        <Feather name="chevron-right" size={24} color={iconColor} />
-                    </View>
-                </Link>
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                <View style={styles.iconContainer}>{item.icon}</View>
+                <ThemedText style={styles.menuText}>{item.title}</ThemedText>
+                <Feather name="chevron-right" size={24} color={iconColor} />
+              </View>
             </TouchableOpacity>
+          )}
           {index < menuItems.length - 1 && <View style={[styles.separator, { backgroundColor: separatorColor }]} />}
         </React.Fragment>
       ))}
