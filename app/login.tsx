@@ -10,14 +10,16 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 const LoginScreen = () => {
+    const router = useRouter();
     const theme = useColorScheme() ?? 'light';
     const inputColor = useThemeColor({ light: '#1F2050', dark: '#FFFFFF' }, 'text');
     const backgroundColor = useThemeColor({ light: '#FFFFFF', dark: '#1A1A2E' }, 'background');
@@ -33,6 +35,7 @@ const LoginScreen = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Validation functions
     const validateEmail = (email: string) => {
@@ -58,12 +61,34 @@ const LoginScreen = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (validateForm()) {
-            Alert.alert('Success', 'Logged in successfully!');
-            // Handle login logic here
-        } else {
-            Alert.alert('Error', 'Please fix the errors in the form');
+            setIsLoading(true);
+            try {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: formData.email,
+                        password: formData.password,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    Alert.alert('Success', 'Logged in successfully!');
+                    router.push('/edit-profile');
+                } else {
+                    Alert.alert('Error', data.message || 'Something went wrong');
+                }
+            } catch (error) {
+                Alert.alert('Error', 'An unexpected error occurred');
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -184,8 +209,13 @@ const LoginScreen = () => {
                         style={styles.loginButton}
                         onPress={handleLogin}
                         activeOpacity={0.8}
+                        disabled={isLoading}
                     >
-                        <Text style={styles.loginButtonText}>Login</Text>
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.loginButtonText}>Login</Text>
+                        )}
                     </TouchableOpacity>
 
                     <View style={styles.orContainer}>
