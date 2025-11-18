@@ -28,11 +28,9 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <RootLayoutNav />
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <RootLayoutNav />
+      <StatusBar style="auto" />
+    </ThemeProvider>
   );
 }
